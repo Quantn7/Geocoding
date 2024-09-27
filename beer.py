@@ -63,8 +63,7 @@ with open('Lat Long Geocoding.csv', 'r') as f:
 		region = i['Region']
 		province = i['Province']
 		district = i['District']
-		F = geojson.dumps(MyPoint(latlong, storecode, storename, address, region, province, district))
-		print(F)
+		F = MyPoint(latlong, storecode, storename, address, region, province, district)
 		features.append(F)
 
 
