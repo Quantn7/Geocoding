@@ -18,22 +18,59 @@ Chú ý: tránh đặt ngược lat/long
 up file này lên GitHub để xem bản đồ kết quả.
 
 - Xem mẫu GEOJSON https://github.com/tung491/make_boba_map
+
+Store code
+Store name
+Address
+Region
+Province
+District
+Latlong
 """
 import geojson
 import csv
 
-coor = []
+#each store wrapped by multi information, so create class for store
+class MyPoint():
+	def __init__(self, latlong, storecode, storename, address, region, province, district):
+		self.latlong = latlong
+		self.storecode = storecode
+		self.storename = storename
+		self.address = address
+		self.region = region
+		self.province = province
+		self.district = district
+	@property
+	def __geo_interface__(self):
+		return {'type': 'Feature',
+				'geometry': {'type': 'Point', 'coordinate': (self.latlong[0], self.latlong[1])},
+				'properties': {'Storecode': self.storecode, 'Storename': self.storename, 'Address': self.address,
+							   'Region': self.region, 'Province': self.province, 'District': self.district}
+							   }
+
+#convert latlong to geojson format will be repeated on each item, so write a function for it
+def convert_latlong(input_data):
+	return tuple(map(lambda x:float(x), input_data[::-1])) #reverse to map the format of geojson
+
+features = []
 with open('Lat Long Geocoding.csv', 'r') as f:
 	loc = csv.DictReader(f)
 	for i in loc:
-		latlon = i['Latlong'].split(',')
-		coor.append(tuple(map(lambda x: float(x), latlon[::-1]))) #reverse lat and long
+		latlong = convert_latlong(i['Latlong'].split(','))
+		storecode = i['Store Code']
+		storename = i['Store Name']
+		address = i['Address']
+		region = i['Region']
+		province = i['Province']
+		district = i['District']
+		F = geojson.dumps(MyPoint(latlong, storecode, storename, address, region, province, district))
+		print(F)
+		features.append(F)
 
-p = [geojson.Point(i) for i in coor]
 
-p_collection = geojson.FeatureCollection(p)
+p_collection = geojson.FeatureCollection(features) #create Feature collection from list of Feature
 
-with open('testmap.geojson', 'w') as f:
+with open('ConcungStore.geojson', 'w') as f:
 	geojson.dump(p_collection, f)
 
 
