@@ -43,7 +43,7 @@ class MyPoint():
 	@property
 	def __geo_interface__(self):
 		return {'type': 'Feature',
-				'geometry': {'type': 'Point', 'coordinate': (self.latlong[0], self.latlong[1])},
+				'geometry': {'type': 'Point', 'coordinates': (self.latlong[0], self.latlong[1])},
 				'properties': {'Storecode': self.storecode, 'Storename': self.storename, 'Address': self.address,
 							   'Region': self.region, 'Province': self.province, 'District': self.district}
 							   }
